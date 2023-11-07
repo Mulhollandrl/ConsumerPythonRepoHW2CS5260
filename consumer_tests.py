@@ -1,28 +1,58 @@
-from unittest import TestCase, main
-from unittest.mock import MagicMock
-import consumer
-from consumer import process_request, args
+import unittest
+import argparse
+from unittest.mock import patch, MagicMock
 
-class TestConsumer(TestCase):
-    # I did not have enough time to finish this, and was planning on reading in the JSON files included in the folder
-    
-    def test_process_request_create_s3(self):
-        # We want to make the storage method s3
+class TestConsumerProgram(unittest.TestCase):
+    @patch('boto3.Session')
+    def test_process_request_create_s3(self, mock_session):
+        from consumer import process_request  # Import your script here
+
+        # Mocking the AWS resources
+        mock_s3 = MagicMock()
+        mock_dynamodb = MagicMock()
+        mock_session.return_value.resource.side_effect = [mock_s3, mock_dynamodb]
+
+        # Test data
+        request = {
+            'type': {'pattern': 'create'},
+            'owner': {'pattern': 'Test Owner'},
+            'widgetId': '123'
+        }
+        args = argparse.Namespace()
         args.storage_strategy = 's3'
-        # I asked ChatGPT a good way to test this, and it suggested MagicMock which creates a mock environment. I think this was helpful
-        # for the bit that I used it
-        consumer.bucket3 = MagicMock()
-        # Now process the request with the consumer file
-        process_request()
-        # ChatGPT gave me this line, but it essentially tests to see if it was put there
-        consumer.bucket3.put_object.assert_called_once()
 
-    def test_process_request_create_dynamodb(self):
-        # We want to make the storage method dynamodb and use the same stuff as before
+        # Call the function
+        process_request(request, args)
+
+        # Assert that the correct methods were called
+        mock_s3.Bucket().put_object.assert_called_once()
+        self.assertEqual(mock_dynamodb.Table().put_item.call_count, 0)
+
+
+    @patch('boto3.Session')
+    def test_process_request_create_dynamodb(self, mock_session):
+        from consumer import process_request  # Import your script here
+
+        # Mocking the AWS resources
+        mock_s3 = MagicMock()
+        mock_dynamodb = MagicMock()
+        mock_session.return_value.resource.side_effect = [mock_s3, mock_dynamodb]
+
+        # Test data
+        request = {
+            'type': {'pattern': 'create'},
+            'owner': {'pattern': 'Test Owner'},
+            'widgetId': '123'
+        }
+        args = argparse.Namespace()
         args.storage_strategy = 'dynamodb'
-        consumer.table = MagicMock()
-        process_request(self.request_create)
-        consumer.table.put_item.assert_called_once()
+
+        # Call the function
+        process_request(request, args)
+
+        # Assert that the correct methods were called
+        mock_dynamodb.Table().put_item.assert_called_once()
+        self.assertEqual(mock_s3.Bucket().put_object.call_count, 0)
 
 if __name__ == '__main__':
-    main()
+    unittest.main()

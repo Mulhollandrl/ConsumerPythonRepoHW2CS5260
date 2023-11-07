@@ -37,7 +37,7 @@ table = dynamodb.Table(table_name)
 queue_url = sqs.get_queue_url(QueueName=args.queue_name)['QueueUrl']
 
 # This processes the requests...
-def process_request(request):
+def process_request(request, args):
     # Now, we want to process create, delete and update requests.
     if request['type']['pattern'] in ['create', 'delete', 'update']:
         # If the storage method is s3, then we need to make sure we parse it the correct way and then feed it in
