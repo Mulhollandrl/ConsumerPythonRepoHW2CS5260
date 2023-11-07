@@ -49,8 +49,6 @@ class TestConsumerProgram(unittest.TestCase):
 
         # Assert that the correct methods were called
         mock_dynamodb.Table().put_item.assert_called_once()
-        print("\n\n\n\n\n\n" + mock_s3.Bucket().put_object.mock_calls)
-        print(mock_dynamodb.Table().put_item.mock_calls + "\n\n\n\n\n\n")
         self.assertEqual(mock_s3.Bucket().put_object.call_count, 0)
 
 if __name__ == '__main__':
