@@ -1,12 +1,11 @@
 import unittest
 import argparse
 from unittest.mock import patch, MagicMock
+from consumer import process_request  # Import your script here
 
 class TestConsumerProgram(unittest.TestCase):
     @patch('boto3.Session')
     def test_process_request_create_s3(self, mock_session):
-        from consumer import process_request  # Import your script here
-
         # Mocking the AWS resources
         mock_s3 = MagicMock()
         mock_dynamodb = MagicMock()
@@ -31,8 +30,6 @@ class TestConsumerProgram(unittest.TestCase):
 
     @patch('boto3.Session')
     def test_process_request_create_dynamodb(self, mock_session):
-        from consumer import process_request  # Import your script here
-
         # Mocking the AWS resources
         mock_s3 = MagicMock()
         mock_dynamodb = MagicMock()
@@ -52,6 +49,8 @@ class TestConsumerProgram(unittest.TestCase):
 
         # Assert that the correct methods were called
         mock_dynamodb.Table().put_item.assert_called_once()
+        print("\n\n\n\n\n\n" + mock_s3.Bucket().put_object.mock_calls)
+        print(mock_dynamodb.Table().put_item.mock_calls + "\n\n\n\n\n\n")
         self.assertEqual(mock_s3.Bucket().put_object.call_count, 0)
 
 if __name__ == '__main__':

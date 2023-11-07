@@ -34,6 +34,7 @@ sqs = session.client('sqs')
 bucket2 = s3.Bucket(bucket2_name)
 bucket3 = s3.Bucket(bucket3_name)
 table = dynamodb.Table(table_name)
+print(f"\n\n\n\n\n\n\n dhfsljdflkdsjflkjdklfjsd\n\n\n\n")
 queue_url = sqs.get_queue_url(QueueName=args.queue_name)['QueueUrl']
 
 # This processes the requests...
