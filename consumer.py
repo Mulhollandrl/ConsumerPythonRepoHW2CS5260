@@ -10,20 +10,19 @@ logging.basicConfig(filename='consumer.log', level=logging.INFO)
 parser = argparse.ArgumentParser(description='consumer for processing requests for widgets')
 parser.add_argument('--storage_strategy', type=str, help='Storage strategy to use.')
 parser.add_argument('--queue_name', type=str, help='Name of the SQS queue.')
+parser.add_argument('--access_key', type=str, help='Your access key.')
+parser.add_argument('--secret_key', type=str, help='Your secret key.')
+parser.add_argument('--session_token', type=str, help='Your session token.')
+parser.add_argument('--bucket2_name', type=str, help='Your bucket2 name.')
+parser.add_argument('--bucket3_name', type=str, help='Your bucket3 name.')
+parser.add_argument('--table_name', type=str, help='Your DynamoDB table name.')
 args = parser.parse_args()
-
-access_key = input("Please provide your access key: ")
-secret_key = input("Please provide your secret key: ")
-session_token = input("Please provide your session token: ")
-bucket2_name = input("Please provide your bucket2 name: ")
-bucket3_name = input("Please provide your bucket3 name: ")
-table_name = input("Please provide your DynamoDB table name: ")
 
 # Create an AWS session using boto3
 session = boto3.Session(
-    aws_access_key_id=access_key,
-    aws_secret_access_key=secret_key,
-    aws_session_token=session_token,
+    aws_access_key_id=args.access_key,
+    aws_secret_access_key=args.secret_key,
+    aws_session_token=args.session_token,
     region_name='us-east-1'
 )
 
@@ -33,11 +32,10 @@ dynamodb = session.resource('dynamodb')
 sqs = session.client('sqs')
 
 # Get all of the buckets we need, the dynamodb table and the sqs queue
-bucket2 = s3.Bucket(bucket2_name)
-bucket3 = s3.Bucket(bucket3_name)
-table = dynamodb.Table(table_name)
+bucket2 = s3.Bucket(args.bucket2_name)
+bucket3 = s3.Bucket(args.bucket3_name)
+table = dynamodb.Table(args.table_name)
 queue_url = sqs.get_queue_url(QueueName=args.queue_name)['QueueUrl']
-print(f"\n\n\n\n\n\n{queue_url}\n\n\n\n\n\n")
 
 # This processes the requests...
 def process_request(request, args):
