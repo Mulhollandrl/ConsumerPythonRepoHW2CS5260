@@ -14,6 +14,7 @@ args = parser.parse_args()
 
 access_key = input("Please provide your access key: ")
 secret_key = input("Please provide your secret key: ")
+session_token = input("Please provide your session token: ")
 bucket2_name = input("Please provide your bucket2 name: ")
 bucket3_name = input("Please provide your bucket3 name: ")
 table_name = input("Please provide your DynamoDB table name: ")
@@ -22,7 +23,8 @@ table_name = input("Please provide your DynamoDB table name: ")
 session = boto3.Session(
     aws_access_key_id=access_key,
     aws_secret_access_key=secret_key,
-    region_name='us-east-1a'
+    aws_session_token=session_token,
+    region_name='us-east-1'
 )
 
 # Create the objects we need for s3, dynamodb and sqs
@@ -35,6 +37,7 @@ bucket2 = s3.Bucket(bucket2_name)
 bucket3 = s3.Bucket(bucket3_name)
 table = dynamodb.Table(table_name)
 queue_url = sqs.get_queue_url(QueueName=args.queue_name)['QueueUrl']
+print(f"\n\n\n\n\n\n{queue_url}\n\n\n\n\n\n")
 
 # This processes the requests...
 def process_request(request, args):
