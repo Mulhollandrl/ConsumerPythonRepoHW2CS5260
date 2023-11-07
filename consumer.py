@@ -6,7 +6,7 @@ import logging
 
 logging.basicConfig(filename='consumer.log', level=logging.INFO)
 
-# This is work being done to parse the arguments for the storage strategy and resources to use as specified in Step 1
+# This is work being done to parse the arguments because that is what we need for docker later on
 parser = argparse.ArgumentParser(description='consumer for processing requests for widgets')
 parser.add_argument('--storage_strategy', type=str, help='Storage strategy to use.')
 parser.add_argument('--queue_name', type=str, help='Name of the SQS queue.')
@@ -26,12 +26,12 @@ session = boto3.Session(
     region_name='us-east-1'
 )
 
-# Create the objects we need for s3, dynamodb and sqs
+# Create the objects we need for s3, dynamodb and sqs using that boto3 session
 s3 = session.resource('s3')
 dynamodb = session.resource('dynamodb')
 sqs = session.client('sqs')
 
-# Get all of the buckets we need, the dynamodb table and the sqs queue
+# Get all of the buckets we need, the dynamodb table and the sqs queue using the aforedefined objects
 bucket2 = s3.Bucket(args.bucket2_name)
 bucket3 = s3.Bucket(args.bucket3_name)
 table = dynamodb.Table(args.table_name)
@@ -89,6 +89,7 @@ def consumer_program():
                 QueueUrl=queue_url,
                 ReceiptHandle=message['ReceiptHandle']
             )
+        # Sleep if you have nothing else to do. I feel like these are wise words.
         else:
             time.sleep(0.1)
 
