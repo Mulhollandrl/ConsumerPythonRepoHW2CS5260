@@ -34,12 +34,10 @@ def validate_request(body):
     required_fields = ["type", "requestId", "widgetId", "owner"]
     other_attributes_required_fields = ["name", "value"]
 
-    # Check if all required fields are in the properties of the body
     if not all(field in body['properties'] for field in required_fields):
         return False
     
-    for obj in body['properties'].get('otherAttributes', []):
-        if not all(field in obj for field in other_attributes_required_fields):
-            return False
+    if not all(field in body['properties']['otherAttributes']['items'][0]['properties'] for field in other_attributes_required_fields):
+        return False
 
     return True
