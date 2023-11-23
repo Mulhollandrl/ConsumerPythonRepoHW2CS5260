@@ -3,6 +3,7 @@ import boto3
 from botocore.exceptions import BotoCoreError
 
 client = boto3.client('lambda', region_name='us-east-1a')
+sqs = boto3.client('sqs')
 
 def lambda_handler(event, context):
     body = json.loads(event['body'])
@@ -14,10 +15,9 @@ def lambda_handler(event, context):
         }
 
     try:
-        response = client.invoke(
-            FunctionName='my_lambda_function',
-            InvocationType='Event',
-            Payload=json.dumps(body)
+        response = sqs.send_message(
+            QueueUrl='https://sqs.us-east-1.amazonaws.com/735066251823/cs5260-requests',
+            MessageBody=json.dumps(body)
         )
     except BotoCoreError as e:
         return {
@@ -31,5 +31,10 @@ def lambda_handler(event, context):
     }
 
 def validate_request(body):
-    # Add your validation logic here
+    required_fields = ["type", "requestId", "widgetId", "owner"]
+
+    # Check if all required fields are in the properties of the body
+    if not all(field in body['properties'] for field in required_fields):
+        return False
+
     return True
